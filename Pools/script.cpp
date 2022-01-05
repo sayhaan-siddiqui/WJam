@@ -16,7 +16,10 @@ void drawstring(std::string string, float X, float Y)
 
 void ScriptMain()
 {
-	//srand(time(0));
+	int con = GetPrivateProfileInt("CONFIG", "Condition", 25, ".\\WJam.ini");
+	double co = ((double)(con) / 100);
+	bool kdown = GetPrivateProfileInt("CONFIG", "Knockdown", 1, ".\\WJam.ini");
+	srand(time(0));
 	int x;
 	std::vector<int> y;
 	Vector3 pos;
@@ -31,7 +34,7 @@ void ScriptMain()
 	while (true)
 	{
 		/*std::stringstream temp_str;
-		temp_str << (check1) << " " << (WEAPON::IS_PED_WEAPON_READY_TO_SHOOT(PLAYER::PLAYER_PED_ID()));
+		temp_str << (co) << " " << (kdown);
 		std::string str = temp_str.str();
 		UIDEBUG::_BG_DISPLAY_TEXT(MISC::VAR_STRING(10, "LITERAL_STRING", _strdup(str.c_str())), 0.5f, 0.5f);*/
 		//pos = ENTITY::GET_ENTITY_COORDS(PLAYER::PLAYER_PED_ID(), true, false);
@@ -69,25 +72,29 @@ void ScriptMain()
 					check1 = false;
 				}
 			}
-			if (WEAPON::GET_WEAPON_DEGRADATION(weaponobject) > 0.25 && !check1) {
+			if (WEAPON::GET_WEAPON_DEGRADATION(weaponobject) > ((float)(co)) && !check1) {
 				x = (rand() % 100);
 				if (x < 20) {
 					PLAYER::SET_PLAYER_INVINCIBLE(PLAYER::PLAYER_ID(), true);
 					//if ((PED::GET_PED_CROUCH_MOVEMENT(PLAYER::PLAYER_PED_ID()))) {
+					if (!kdown) {
+						PED::SET_PED_CAN_RAGDOLL(PLAYER::PLAYER_PED_ID(), false);
+					}
 					FIRE::ADD_EXPLOSION(pos.x, pos.y, pos.z, 15, 0.5f, true, false, 0.5f);
 					//}
 					//else {
 						//FIRE::ADD_EXPLOSION(pos.x, pos.y, pos.z + 0.5f, 15, 0.5f, true, false, 0.5f);
 					//}
-					FIRE::ADD_EXPLOSION(pos.x, pos.y, pos.z, 13, 0.2f, true, false, 0.5f);
+					FIRE::ADD_EXPLOSION(pos.x, pos.y, pos.z, 13, 0.0f, true, false, 0.5f);
 					/*comment this line back in when finished*/PLAYER::SET_PLAYER_INVINCIBLE(PLAYER::PLAYER_ID(), false);
 					//WEAPON::_DROP_CURRENT_PED_WEAPON(PLAYER::PLAYER_PED_ID(), false, true, false, true);
+					PED::SET_PED_CAN_RAGDOLL(PLAYER::PLAYER_PED_ID(), true);
 					broken = true;
 					tempobject = ENTITY::GET_OBJECT_INDEX_FROM_ENTITY_INDEX(WEAPON::GET_CURRENT_PED_WEAPON_ENTITY_INDEX(PLAYER::PLAYER_PED_ID(), 0));
 					ojects.push_back(tempobject);
 				}
 			}
-			else if (WEAPON::GET_WEAPON_DEGRADATION(weaponobject) < 0.25 && check1) {
+			else if (WEAPON::GET_WEAPON_DEGRADATION(weaponobject) < ((float)(co)) && check1) {
 				broken = false;
 				for (int i = 0; i < ojects.size(); i++) {
 					if (ojects[i] == weaponobject) {
